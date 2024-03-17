@@ -644,11 +644,12 @@ app.get("/date_prof", (req, res) => {
   });
 });
 app.get('/date_open_prof', (req, res) => {
-  if (req.session.matriculeEtudiant !== "admin") {
-    return res.render('404');
-  }
+  // if (req.session.matriculeEtudiant !== "admin") {
+  //   return res.render('404');
+  // }
   const date = req.query.date;
   const time = req.query.time;
+ 
 
     // Insérer ou mettre à jour la date dans la base de données
     db.collection('date_prof').find().toArray((err, data) => {
@@ -664,10 +665,20 @@ app.get('/date_open_prof', (req, res) => {
                     console.error("Erreur lors de l'insertion de la date :", err);
                     return res.render('error');
                 }
-                console.log("Les emails ont été envoyés :", emails);
-                sendEmail("Gestion de réclamation", emails, 'Reclamation Date ', 'La réclamation est ouverte. Pour traiter les notes, veuillez visiter notre site.');
+                db.collection('etudiants').find({}, { "matricule": 1, "_id": 0 }).toArray(function(err, result) {
+                  if (err) throw err;
+              
+                  // Maintenant, result contient la liste des matricules
+                  let emails = [];
+              
+                  result.forEach(function(etudiant) {
+                      let matricule = etudiant.matricule;
+                      let email = matricule + "@supnum.mr";
+                      emails.push(email);
+                  });
+                sendEmail("netcode", emails, 'Reclamation Date ', 'La réclamation est ouverte. Pour traiter les notes, veuillez visiter notre site.');
                 return res.redirect('/eleve');
-            });
+            });});
         } else {
             const updateData = {
                 $set: {
@@ -682,10 +693,20 @@ app.get('/date_open_prof', (req, res) => {
                     console.error("Erreur lors de la mise à jour de la date :", err);
                     return res.render('error');
                 }
-                console.log("Les emails ont été envoyés :", emails);
+                db.collection('etudiants').find({}, { "matricule": 1, "_id": 0 }).toArray(function(err, result) {
+                  if (err) throw err;
+              
+                  // Maintenant, result contient la liste des matricules
+                  let emails = [];
+              
+                  result.forEach(function(etudiant) {
+                      let matricule = etudiant.matricule;
+                      let email = matricule + "@supnum.mr";
+                      emails.push(email);
+                  });
                 sendEmail("Gestion de réclamation", emails, 'Reclamation Date', 'La date de réclamation a été modifiée. Pour plus d\'informations, visitez notre site.');
                 return res.redirect('/eleve');
-            });
+            });});
         }
     });
 });
