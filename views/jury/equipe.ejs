@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h3>critere</h3>
+    <table border="1px solid black">
+      <thead>
+        <tr>
+          <th>nom equipe</th>
+          <th>leader</th>
+          <th>membre</th>
+          <th>moyenne</th>
+          <th>action</th>
+        </tr>
+      </thead>
+      <tbody>
+      
+        <% data.forEach((item) => { %>
+        <tr>
+          <td><%= item.name %></td>
+          <td><%= item.lead %></td>
+          <td><%= item.membres %></td>
+          <td></td>
+          <td><a href="noter">noter</a></td>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </body>
+</html>

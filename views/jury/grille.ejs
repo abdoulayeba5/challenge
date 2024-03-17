@@ -6,25 +6,30 @@
     <title>Document</title>
   </head>
   <body>
-    <h3>critere</h3>
-    <table border="1px solid black">
-      <thead>
-        <tr>
-          <th>Critere</th>
-          <th>coefficient</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% data.forEach((item) => { %>
-        <tr>
-          <td><%= item.critere %></td>
-          <td><%= item.coef %></td>
-          <td><input type="text" name="note" ></td>
-        </tr>
-        <% }); %>
-      </tbody>
-    </table>
+    <h3>noter le team</h3>
 
-   
+    <form action="evaluer" method="post">
+      Conception : <input type="number" name="con" id="" /><br />
+      <br />
+      Choix technologiques : <input type="number" name="tec" id="" /><br />
+      <br />
+      Prises en charge des fonctionnalités demandées :
+      <input type="number" name="Fd" id="" /><br />
+      <br />
+      Ergonomie : <input type="number" name="EG" id="" /><br />
+      <br />
+      Généricité de la solution : <input type="number" name="Gs" id="" /><br />
+      <br />
+      Qualité de la présentation (Powerpoint, Démonstration, etc) :
+      <input type="number" name="Qp" id="" /><br />
+      <br />
+      Soumission des livrables à temps :
+      <input type="number" name="TS" id="" /><br />
+      <br />
+      Utilisation d outils de travail collaboratif (gestion de versions, gestion
+      de tâches,....) : <input type="number" name="OC" id="" /><br />
+      <br />
+      <input type="submit" value="submit" />
+    </form>
   </body>
 </html>

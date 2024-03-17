@@ -242,6 +242,115 @@ async function addCriter(req, res) {
 
 // Les autres fonctions du contrôleur administrateur peuvent être remplies de manière similaire
 
+
+app.get("/date_prof_update", (req, res) => {
+  if (req.session.matriculeEtudiant !== "admin") {
+    return res.render('404');
+  }
+  db.collection('date_prof').find().toArray((err, datta) => {
+    years = datta[0].date;
+    times = datta[0].time;
+    return res.render('open_&&_date_prof', { date: "close", years, times });
+
+  })
+
+});
+app.get("/date_prof", (req, res) => {
+  if (req.session.matriculeEtudiant !== "admin") {
+    return res.render('404');
+  }
+  db.collection('date_prof').find().toArray((err, datta) => {
+    if (datta.length >= 1) {
+      const dat = datta[0].date + "T" + datta[0].time + ":00";
+      const today = new Date();
+      const date = new Date(dat);
+      if (today < date) {
+        const dd = datta[0].date + " " + datta[0].time + ":00";
+        years = datta[0].date;
+        times = datta[0].time;
+        return res.render('open_&&_date_prof', { date: "open", dd, years, times });
+      } else {
+        console.log("termine");
+        return res.render('open_&&_date_prof', { date: "termine", years: "", times: "" });
+      }
+    } else { return res.render('open_&&_date_prof', { date: "close", years: "", times: "" }); }
+  });
+});
+app.get('/date_open_prof', (req, res) => {
+  if (req.session.matriculeEtudiant !== "admin") {
+    return res.render('404');
+  }
+  const date = req.query.date;
+  const time = req.query.time;
+
+  // Récupérer tous les emails des enseignants dans la collection 'enseignant'
+  db.collection('enseignant').find({}, { projection: { autresprof: 1, email: 1 } }).toArray((err, enseignants) => {
+    if (err) {
+        console.error("Erreur lors de la récupération des enseignants :", err);
+        return res.render('error');
+    }
+
+    // Liste de tous les emails des enseignants
+    const emails = [];
+
+    // Récupérer tous les emails de la liste autresprof de chaque enseignant
+    enseignants.forEach(enseignant => {
+        if (enseignant.autresprof && enseignant.autresprof.length > 0) {
+            enseignant.autresprof.forEach(prof => {
+                if (prof.email_autre) {
+                    emails.push(prof.email_autre);
+                }
+            });
+        }
+        
+        // Ajouter l'email principal de l'enseignant s'il existe
+        if (enseignant.email) {
+            emails.push(enseignant.email);
+        }
+    });
+
+    // Insérer ou mettre à jour la date dans la base de données
+    db.collection('date_prof').find().toArray((err, data) => {
+        if (data.length === 0) {
+            const newData = {
+                "date": date,
+                "time": time,
+                "reclamation": "open"
+            };
+
+            db.collection('date_prof').insertOne(newData, (err, collection) => {
+                if (err) {
+                    console.error("Erreur lors de l'insertion de la date :", err);
+                    return res.render('error');
+                }
+                console.log("Les emails ont été envoyés :", emails);
+                sendEmail("Gestion de réclamation", emails, 'Reclamation Date ', 'La réclamation est ouverte. Pour traiter les notes, veuillez visiter notre site.');
+                return res.redirect('/eleve');
+            });
+        } else {
+            const updateData = {
+                $set: {
+                    "date": date,
+                    "time": time,
+                    "reclamation": "open"
+                }
+            };
+
+            db.collection('date_prof').updateMany({ reclamation: "open" }, updateData, function (err, data) {
+                if (err) {
+                    console.error("Erreur lors de la mise à jour de la date :", err);
+                    return res.render('error');
+                }
+                console.log("Les emails ont été envoyés :", emails);
+                sendEmail("Gestion de réclamation", emails, 'Reclamation Date', 'La date de réclamation a été modifiée. Pour plus d\'informations, visitez notre site.');
+                return res.redirect('/eleve');
+            });
+        }
+    });
+});
+
+
+});
 module.exports = {
   renderAdminHomePage,
   importDataFromExcel,
