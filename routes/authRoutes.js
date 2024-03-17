@@ -6,6 +6,7 @@ router.get("/", authController.renderLoginPage);
 router.get("/logout", authController.logoutUser);
 router.post("/login", authController.loginUser);
 router.post("/register", authController.registerUser);
+router.post("/verify_code_registre", authController.verifyRegistre);
 // router.get('/forgot-password', authController.renderForgotPasswordPage);
 // router.post('/forgot-password', authController.sendResetPasswordEmail);
 // router.get('/reset-password/:token', authController.renderResetPasswordPage);

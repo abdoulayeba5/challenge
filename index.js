@@ -27,6 +27,11 @@ const adminRoutes = require("./routes/adminRoutes");
 // Utiliser les routes administratives
 app.use("/admin", adminRoutes);
 
+const studentRoutes = require("./routes/studentRoutes");
+
+// Utiliser les routes administratives
+app.use("/student", studentRoutes);
+
 // Démarrer le serveur
 const PORT = process.env.PORT || 3002;
 app.listen(PORT, () =>

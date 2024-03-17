@@ -26,12 +26,37 @@ async function renderAdminHomePage(req, res) {
 
 // Importer des données à partir d'un fichier Excel
 async function importDataFromExcel(req, res) {
-  const filePath = req.body.filePath;
+  const filePath = req.body.fileInput;
 
   try {
-    const importedData = await importDataFromExcel(filePath);
+    function importFromExcel(filePath) {
+      const workbook = xlsx.readFile(filePath);
+      const matieresSheet = workbook.Sheets["matieres"];
+      const matieresData = xlsx.utils.sheet_to_json(matieresSheet);
+      return matieresData;
+    }
+    const filePath = req.body.fileInput;
+    console.log(filePath);
+
+    // Import data from Excel
+    const importedData = importFromExcel(filePath);
+    console.log(importedData); // Log imported data to verify
+
+    // Check if importedData is not empty
+    if (!importedData || importedData.length === 0) {
+      return res.status(400).send("No data found in the Excel file.");
+    }
+
+    // Insert data into MongoDB
+    db.collection("etudiants").insertMany(importedData, (err, result) => {
+      if (err) {
+        console.error("Error inserting data into database:", err);
+        return res.status(500).send("Error inserting data into database.");
+      }
+      console.log("Data inserted successfully:", result.insertedCount);
+      return res.redirect("dashboard");
+    });
     // Logique pour insérer les données importées dans la base de données
-    res.redirect("/admin/dashboard"); // Rediriger vers le tableau de bord de l'administrateur après l'importation réussie
   } catch (error) {
     console.error(
       "Erreur lors de l'importation des données depuis Excel :",
