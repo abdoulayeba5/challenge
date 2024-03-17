@@ -7,8 +7,10 @@
 </head>
 <body>
 
-<form id="equipeForm">
+<form id="equipeForm" action="/equipe_insert">
   <!-- Choix du Lead -->
+  <label for="lead">Nom equipe :</label>
+  <input type="text" name="name">
   <label for="lead">Lead :</label>
   <select id="lead" name="lead">
     <% array.forEach((student, index) => { %>
@@ -30,61 +32,48 @@
 
   <!-- Choix du nombre de membres de l'équipe -->
   <label for="nombreMembres">Nombre de membres de l'équipe (entre 6 et 8) :</label>
-  <input type="number" id="nombreMembres" name="nombreMembres" min="6" max="8">
+  <input type="number" id="nombreMembres" name="nombreMembres" min="4" max="6">
   <br>
 
   <div id="memberSelections">
-<select id="member" name="member">
-  <% array.forEach((student, index) => { %>
-    <option value="<%= student.matricule %>"><%= student.matricule %></option>
-  <% }) %>
-</select>
-</div>
+    <!-- Select elements will be dynamically generated here -->
+  </div>
 
-<!-- Insérer ici les options pour le choix de l'Adjoint -->
-<button type="submit">Soumettre</button>
+  <!-- Insérer ici les options pour le choix de l'Adjoint -->
+  <button type="submit">Soumettre</button>
 </form>
-
+<h1><%=error%></h1>
 <script>
-// Parse the JSON string embedded in the script tag
-const arrayData = JSON.parse('<%- JSON.stringify(array) %>');
+  // Parse the JSON string embedded in the script tag
+  const arrayData = JSON.parse('<%- JSON.stringify(array) %>');
 
-// Function to dynamically generate select elements based on the number entered
-function generateSelects() {
-  const selectContainer = document.getElementById('memberSelections');
-  selectContainer.innerHTML = ''; // Clear previous select elements
+  // Function to dynamically generate select elements based on the number entered
+  function generateSelects() {
+    const selectContainer = document.getElementById('memberSelections');
+    selectContainer.innerHTML = ''; // Clear previous select elements
 
-  const numberOfMembers = parseInt(document.getElementById('nombreMembres').value);
-  for (let i = 0; i < numberOfMembers; i++) {
-    const select = document.createElement('select');
-    select.setAttribute('name', `member_${i}`);
-    selectContainer.appendChild(select);
+    const numberOfMembers = parseInt(document.getElementById('nombreMembres').value);
 
-    // Add options to the select element
-    const availableOptions = [...arrayData]; // Create a copy of the arrayData
-    select.addEventListener('change', (event) => {
-      const selectedValue = event.target.value;
-      availableOptions.forEach((option) => {
-        if (option.matricule === selectedValue) {
-          option.disabled = true; // Disable the selected option
-        }
+    for (let i = 0; i < numberOfMembers; i++) {
+      const select = document.createElement('select');
+      select.setAttribute('name', `member_${i}`);
+      selectContainer.appendChild(select);
+
+      // Add options to the select element
+      arrayData.forEach((student) => {
+        const option = document.createElement('option');
+        option.value = student.matricule;
+        option.textContent = student.matricule;
+        select.appendChild(option);
       });
-    });
-
-    availableOptions.forEach((student) => {
-      const option = document.createElement('option');
-      option.value = student.matricule;
-      option.textContent = student.matricule;
-      select.appendChild(option);
-    });
+    }
   }
-}
 
-// Event listener to call generateSelects when the input value changes
-document.getElementById('nombreMembres').addEventListener('change', generateSelects);
+  // Event listener to call generateSelects when the input value changes
+  document.getElementById('nombreMembres').addEventListener('change', generateSelects);
 
-// Initial call to generateSelects to populate select elements based on initial input value
-generateSelects();
+  // Initial call to generateSelects to populate select elements based on initial input value
+  generateSelects();
 </script>
 
 </body>

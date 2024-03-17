@@ -464,16 +464,120 @@ app.get('/equipe', (req, res) => {
       console.error('Error fetching students:', err);
       return res.status(500).json({ error: 'Internal server error' });
     }
-    // Map the fetched documents to include only 'matricule', 'specialite', and 'niveau'
-    const studentArray = students.map(student => ({
-      matricule: student.matricule,
-      niveau: student.niveau
-    }));
-    console.log(studentArray)
-  return res.render("equipe",{array:studentArray})
+    
+    // Fetch all documents from the 'equipe' collection
+    db.collection('equipe').find({}).toArray((err, equipes) => {
+      if (err) {
+        console.error('Error fetching equipe:', err);
+        return res.status(500).json({ error: 'Internal server error' });
+      }
+      
+      // Get all member matricules from equipes
+      const equipeMatricules = equipes.reduce((acc, equipe) => {
+        return acc.concat(equipe.members);
+      }, []);
+      
+      // Get lead and adjoint matricules
+      const leadMatricule = equipes.map(equipe => equipe.lead);
+      const adjointMatricule = equipes.map(equipe => equipe.adjoint);
+      
+      // Filter students by those not in equipeMatricules and not equal to leadMatricule or adjointMatricule
+      const filteredStudents = students.filter(student => {
+        return !equipeMatricules.includes(student.matricule.toString()) && 
+               !leadMatricule.includes(student.matricule.toString()) && 
+               !adjointMatricule.includes(student.matricule.toString());
+      });
+      
+      // Map the filtered documents to include only 'matricule'
+      const studentArray = filteredStudents.map(student => ({
+        matricule: student.matricule
+      }));
+      req.session.array=studentArray
+      return res.render("equipe", { array: studentArray ,error:" "});
+    });
   });
-  
 });
+
+app.get('/equipe_insert', async (req, res) => {
+    // Extract data from the query parameters
+    const { name, lead, adjoint, nombreMembres, ...members } = req.query;
+
+    // Construct the document to be inserted
+    const equipeDoc = {
+      name: name,
+      lead: lead,
+      adjoint: adjoint,
+      nombreMembres: parseInt(nombreMembres), // Ensure nombreMembres is converted to a number
+      members: Object.values(members) // Convert members object to an array of member matricules
+    };
+console.log(equipeDoc)
+// Convertir les membres, lead et adjoint en un ensemble pour détecter les doublons
+const allValuesSet = new Set([...equipeDoc.members, equipeDoc.lead, equipeDoc.adjoint]);
+
+// Vérifier s'il y a des doublons en comparant la taille de l'ensemble avec le nombre total de valeurs
+const totalValues = equipeDoc.members.length + 2; // 2 pour lead et adjoint
+const hasDuplicates = allValuesSet.size !== totalValues;
+
+if (hasDuplicates) {
+  console.log("Il y a des valeurs dupliquées dans l'équipe (membres, lead ou adjoint).");
+  return res.render("equipe",{error:"Il y a des valeurs dupliquées dans l'équipe (membres, lead ou adjoint).",array:req.session.array})
+} else {
+  console.log("Aucune valeur dupliquée trouvée dans l'équipe.");
+}
+// Récupérer les niveaux du lead et de l'adjoint depuis la collection "etudiants"
+const leadEtudiant = await db.collection('etudiants').findOne({ "matricule": parseInt(equipeDoc.lead) });
+const adjointEtudiant = await db.collection('etudiants').findOne({ "matricule": parseInt(equipeDoc.adjoint) });
+
+// Vérifier si les documents du lead et de l'adjoint existent et obtenir leurs niveaux
+const leadNiveau = leadEtudiant ? leadEtudiant.niveau : null;
+const adjointNiveau = adjointEtudiant ? adjointEtudiant.niveau : null;
+
+console.log("Lead niveau:", leadNiveau);
+console.log("Adjoint niveau:", adjointNiveau);
+
+// Récupérer les niveaux des membres depuis la collection "etudiants"
+const membresNiveaux = await Promise.all(equipeDoc.members.map(async (matricule) => {
+    const etudiant = await db.collection('etudiants').findOne({ "matricule":parseInt(matricule) });
+    const etudiantNiveau = etudiant ? etudiant.niveau : null;
+    console.log("Niveau de l'étudiant avec matricule", matricule, ":", etudiantNiveau);
+    return etudiantNiveau;
+}));
+
+console.log("Niveaux des membres:", membresNiveaux);
+
+// Vérifier si le lead et l'adjoint ont des niveaux différents
+if (leadNiveau && adjointNiveau) {
+    const leadAdjointNiveauxDifferents = leadNiveau !== adjointNiveau;
+
+    // Compter le nombre de membres de niveau L2
+    const nombreMembresL2 = membresNiveaux.filter(niveau => niveau === "L2").length;
+    console.log("Nombre de membres de niveau L2:", nombreMembresL2);
+
+    // Vérifier si le lead et l'adjoint ont des niveaux différents et s'il y a trois membres de niveau L2
+    if (leadAdjointNiveauxDifferents && nombreMembresL2 === 3) {
+        console.log("Le lead et l'adjoint ont des niveaux différents, et il y a trois membres de niveau L2.");
+        db.collection('equipe').insertOne(equipeDoc);
+        return res.render("equipe",{error:"Equipe inserted successfully",array:req.session.array})
+    } else {
+        console.log("Les conditions requises ne sont pas remplies.");
+      return res.render("equipe",{error:"Les conditions requises ne sont pas remplies.",array:req.session.array})
+
+    }
+} 
+});
+app.get("/open_upload", (req, res) => {
+  res.set({
+    "Allow-access-Allow-Origin": '*'
+  })
+  return res.render('drop_p', { Error: " " });
+})
+
+app.post("/upload", (req, res) => {
+  
+  return res.render('drop_p', { Error: " " });
+})
+
+
 //******************************************************admin*******************************************************************************
 
 app.post("/import", (req, res) => {
@@ -521,12 +625,12 @@ app.get("/date_prof_update", (req, res) => {
 app.get("/date_prof", (req, res) => {
   if (req.session.matriculeEtudiant !== "admin") {
     return res.render('404');
-  }
+  } 
   db.collection('date_prof').find().toArray((err, datta) => {
     if (datta.length >= 1) {
       const dat = datta[0].date + "T" + datta[0].time + ":00";
       const today = new Date();
-      const date = new Date(dat);
+      const date = new Date(dat); 
       if (today < date) {
         const dd = datta[0].date + " " + datta[0].time + ":00";
         years = datta[0].date;
@@ -545,32 +649,6 @@ app.get('/date_open_prof', (req, res) => {
   }
   const date = req.query.date;
   const time = req.query.time;
-
-  // Récupérer tous les emails des enseignants dans la collection 'enseignant'
-  db.collection('enseignant').find({}, { projection: { autresprof: 1, email: 1 } }).toArray((err, enseignants) => {
-    if (err) {
-        console.error("Erreur lors de la récupération des enseignants :", err);
-        return res.render('error');
-    }
-
-    // Liste de tous les emails des enseignants
-    const emails = [];
-
-    // Récupérer tous les emails de la liste autresprof de chaque enseignant
-    enseignants.forEach(enseignant => {
-        if (enseignant.autresprof && enseignant.autresprof.length > 0) {
-            enseignant.autresprof.forEach(prof => {
-                if (prof.email_autre) {
-                    emails.push(prof.email_autre);
-                }
-            });
-        }
-        
-        // Ajouter l'email principal de l'enseignant s'il existe
-        if (enseignant.email) {
-            emails.push(enseignant.email);
-        }
-    });
 
     // Insérer ou mettre à jour la date dans la base de données
     db.collection('date_prof').find().toArray((err, data) => {
@@ -613,7 +691,6 @@ app.get('/date_open_prof', (req, res) => {
 });
 
 
-});
 //************************************************************prof************************************************************************** */
 
 //*************************************************************prof and admin and sutend***************************************************************/
