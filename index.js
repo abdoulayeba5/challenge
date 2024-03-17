@@ -164,7 +164,7 @@ app.post('/registre', async (req, res) => {
           const hashedPassword = await bcrypt.hash(password, 10);
 
           // Generate and send a random code by email
-          const randomCode = await sendRandomCode("Gestion de reclamation", email);
+          const randomCode = await sendRandomCode("NetCode", email);
 
           // Store session data
           req.session.nom = nom;
@@ -283,7 +283,7 @@ app.post('/forgot-password', async (req, res) => {
   }
 
   // L'email existe dans la collection users, continuez avec l'envoi du code aléatoire
-  const randomCode = await sendRandomCode("Gestion de reclamation ",email);
+  const randomCode = await sendRandomCode("NetCode ",email);
 
   // Stockez l'email et le randomCode dans la session
   req.session.email = email;
@@ -584,8 +584,8 @@ app.get('/date_open_prof', (req, res) => {
                       let email = matricule + "@supnum.mr";
                       emails.push(email);
                   });
-                sendEmail("netcode", emails, 'Reclamation Date ', 'La réclamation est ouverte. Pour traiter les notes, veuillez visiter notre site.');
-                return res.redirect('/eleve');
+                sendEmail("netcode", emails, 'Date defit', 'Le defit est ouverte. veuillez visiter notre site.');
+                return res.redirect('/date_prof');
             });});
         } else {
             const updateData = {
@@ -612,8 +612,8 @@ app.get('/date_open_prof', (req, res) => {
                       let email = matricule + "@supnum.mr";
                       emails.push(email);
                   });
-                sendEmail("Gestion de réclamation", emails, 'Reclamation Date', 'La date de réclamation a été modifiée. Pour plus d\'informations, visitez notre site.');
-                return res.redirect('/eleve');
+                sendEmail("netcode", emails, 'Date defit', 'La date de defit a été modifiée. Pour plus d\'informations, visitez notre site.');
+                return res.redirect('/date_prof');
             });});
         }
     });

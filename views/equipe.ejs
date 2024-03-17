@@ -354,26 +354,28 @@
            <span class="tooltip">equipe</span>
          </li>
          <li>
-            <a href="/upload">
+            <a href="/open_upload">
               <i class='bx bx-cloud-upload' ></i>
               <span class="links_name">upload</span>
             </a>
             <span class="tooltip">upload</span>
           </li>
         <%}%>
-     <li class="profile">
-         <div class="profile-details">
-           <!--<img src="profile.jpg" alt="profileImg">-->
-           <div class="name_job">
-             <div class="name">Gabriel Toledo</div>
-             <div class="job">Frontend Developer</div>
-           </div>
-         </div>
-         <i class='bx bx-log-out' id="log_out" ></i>
-     </li>
+        <li class="profile">
+          <a href="/">
+             <div class="profile-details">
+               <!--<img src="profile.jpg" alt="profileImg">-->
+               <div class="name_job">
+                 <div class="job">log out</div>
+               </div>
+             </div>
+             <i class='bx bx-log-out' id="log_out" ></i>
+            </a>
+         </li>
     </ul>
   </div>
   <section class="home-section">
+    <br><br><br><br>
     <form id="equipeForm" action="/equipe_insert">
       <!-- Choix du Lead -->
       <label for="name">Nom de l'équipe :</label>
