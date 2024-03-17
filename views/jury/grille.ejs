@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h3>critere</h3>
+    <table border="1px solid black">
+      <thead>
+        <tr>
+          <th>Critere</th>
+          <th>coefficient</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% data.forEach((item) => { %>
+        <tr>
+          <td><%= item.critere %></td>
+          <td><%= item.coef %></td>
+          <td><input type="text" name="note" ></td>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table>
+
+   
+  </body>
+</html>

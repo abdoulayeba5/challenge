@@ -7,6 +7,7 @@ const app = express();
 const routes = require("./routes/authRoutes");
 const db = require("./config/databaseConfig");
 
+
 app.use(
   session({ secret: "your-secret-key", resave: false, saveUninitialized: true })
 );
@@ -31,6 +32,11 @@ const studentRoutes = require("./routes/studentRoutes");
 
 // Utiliser les routes administratives
 app.use("/student", studentRoutes);
+
+const profRoutes = require("./routes/professorRoutes");
+
+// Utiliser les routes administratives
+app.use("/jury", profRoutes);
 
 // Démarrer le serveur
 const PORT = process.env.PORT || 3002;

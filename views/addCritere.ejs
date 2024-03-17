@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h3>critere</h3>
+    <table border="1px solid black">
+      <thead>
+        <tr>
+          <th>Critere</th>
+          <th>coefficient</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% data.forEach((item) => { %>
+        <tr>
+          <td><%= item.critere %></td>
+          <td><%= item.coef %></td>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table>
+
+    <button><a href="">add critere</a></button>
+    <form action="add_critere" method="post">
+      <input
+        type="hidden"
+        value="65f73b2420c956110f927bfc"
+        name="idChallenge"
+      />
+      critere :<input type="text" name="critere" /> <br />
+      coefficient :<input type="number" name="coef" />
+      <br />
+      <input type="submit" value="submit" />
+    </form>
+  </body>
+</html>

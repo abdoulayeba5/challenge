@@ -2,7 +2,6 @@ const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
 const { sendRandomCode } = require("../services/emailService");
 
-
 const db = require("../config/databaseConfig");
 // const User = require("../models/User");
 
@@ -51,7 +50,7 @@ async function loginUser(req, res) {
 async function registerUser(req, res) {
   const { nom, email, password, cpassword, niveau, specialite } = req.body;
   const mat = email.slice(0, 5);
-  console.log("here",mat);
+  console.log("here", mat);
 
   try {
     const existingUser = await User.findOne({ email: email });
@@ -159,7 +158,6 @@ const transporter = nodemailer.createTransport({
     pass: "izkzmfpgsavsioul",
   },
 });
-
 
 // Fonction pour générer un code aléatoire
 function generateRandomCode(length) {

@@ -1,7 +1,7 @@
-// const express = require('express');
-// const router = express.Router();
-// const professorController = require('../controllers/professorController');
+const express = require('express');
+const router = express.Router();
+const professorController = require('../controllers/professorController');
 
-// router.get('/', professorController.renderProfessorPage);
+router.get('/noter', professorController.grille);
 
-// module.exports = router;
+module.exports = router;
