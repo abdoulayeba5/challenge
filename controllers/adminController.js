@@ -12,7 +12,7 @@ async function renderAdminHomePage(req, res) {
       "Allow-access-Allow-Origin": "*",
     });
     const imagePath = "public/logo.png";
-    return res.render("welcome", {
+    return res.render("home1", {
       Error: req.session.matriculeEtudiant,
       imagePath: imagePath,
     });
@@ -27,6 +27,24 @@ async function renderAdminHomePage(req, res) {
   }
 }
 
+// Afficher la page d'accueil de l'administrateur
+async function student(req, res) {
+  res.render("admin/student");
+}
+
+// Afficher la page d'accueil de l'administrateur
+async function equipe(req, res) {
+  res.render("equipe");
+}
+// Afficher la page d'accueil de l'administrateur
+async function jury(req, res) {
+  res.render("jury");
+}
+
+// Afficher la page d'accueil de l'administrateur
+async function challenge(req, res) {
+  res.render("challenge");
+}
 // Importer des données à partir d'un fichier Excel
 async function importDataFromExcel(req, res) {
   const filePath = req.body.fileInput;
@@ -68,38 +86,6 @@ async function importDataFromExcel(req, res) {
     res.render("error");
   }
 }
-
-// Afficher la page de gestion des utilisateurs
-async function renderManageUsersPage(req, res) {
-  try {
-    // Logique pour récupérer les utilisateurs depuis la base de données
-    res.render("admin/manageUsers", {
-      title: "Manage Users Page",
-      users: users,
-    }); // users sont les utilisateurs récupérés de la base de données
-  } catch (error) {
-    console.error(
-      "Erreur lors de l'affichage de la page de gestion des utilisateurs :",
-      error
-    );
-    res.render("error");
-  }
-}
-
-// Afficher la page de gestion des données
-async function renderManageDataPage(req, res) {
-  try {
-    // Logique pour récupérer les données depuis la base de données
-    res.render("admin/manageData", { title: "Manage Data Page", data: data }); // data est la donnée récupérée de la base de données
-  } catch (error) {
-    console.error(
-      "Erreur lors de l'affichage de la page de gestion des données :",
-      error
-    );
-    res.render("error");
-  }
-}
-
 // Ajouter les membre de jury
 async function newJuryMember(req, res) {
   const { nom, prenom, email, password, cpassword } = req.body;
@@ -140,7 +126,6 @@ async function newJuryMember(req, res) {
     res.render("error");
   }
 }
-
 // Ajouter les membre de jury
 async function grille(req, res) {
   idChallenge = "65f73b2420c956110f927bfc";
@@ -154,46 +139,6 @@ async function grille(req, res) {
     res.render("addCritere", { data: existingGrille.section });
   } catch (error) {
     console.error("Erreur lors de l'ajout du critère :", error);
-    res.render("error");
-  }
-}
-
-// Ajouter les membre de jury
-async function grilleEvaluation(req, res) {
-  const { nom, prenom, email, password, cpassword } = req.body;
-
-  try {
-    const existingUser = await User.findOne({ email: email });
-
-    if (existingUser) {
-      return res.render("login", {
-        Error:
-          "L'adresse email est déjà utilisée. Veuillez choisir une autre adresse email.",
-      });
-    }
-    if (password !== cpassword) {
-      return res.render("login", {
-        Error: "Les mots de passe ne sont pas identiques.",
-      });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const user = {
-      fname: nom,
-      lname: prenom,
-      email: email,
-      password: hashedPassword,
-      types: "jury",
-    };
-    await db.collection("users").insertOne(user);
-
-    res.redirect("/ajout_jury");
-  } catch (error) {
-    console.error(
-      "Erreur lors de l'affichage de la page de gestion des données :",
-      error
-    );
     res.render("error");
   }
 }
@@ -242,122 +187,157 @@ async function addCriter(req, res) {
 
 // Les autres fonctions du contrôleur administrateur peuvent être remplies de manière similaire
 
-
-app.get("/date_prof_update", (req, res) => {
+async function dateprofupdate(req, res) {
   if (req.session.matriculeEtudiant !== "admin") {
-    return res.render('404');
+    return res.render("404");
   }
-  db.collection('date_prof').find().toArray((err, datta) => {
-    years = datta[0].date;
-    times = datta[0].time;
-    return res.render('open_&&_date_prof', { date: "close", years, times });
-
-  })
-
-});
-app.get("/date_prof", (req, res) => {
+  db.collection("date_prof")
+    .find()
+    .toArray((err, datta) => {
+      years = datta[0].date;
+      times = datta[0].time;
+      return res.render("open_&&_date_prof", { date: "close", years, times });
+    });
+}
+async function dateProf(req, res) {
   if (req.session.matriculeEtudiant !== "admin") {
-    return res.render('404');
+    return res.render("404");
   }
-  db.collection('date_prof').find().toArray((err, datta) => {
-    if (datta.length >= 1) {
-      const dat = datta[0].date + "T" + datta[0].time + ":00";
-      const today = new Date();
-      const date = new Date(dat);
-      if (today < date) {
-        const dd = datta[0].date + " " + datta[0].time + ":00";
-        years = datta[0].date;
-        times = datta[0].time;
-        return res.render('open_&&_date_prof', { date: "open", dd, years, times });
+  db.collection("date_prof")
+    .find()
+    .toArray((err, datta) => {
+      if (datta.length >= 1) {
+        const dat = datta[0].date + "T" + datta[0].time + ":00";
+        const today = new Date();
+        const date = new Date(dat);
+        if (today < date) {
+          const dd = datta[0].date + " " + datta[0].time + ":00";
+          years = datta[0].date;
+          times = datta[0].time;
+          return res.render("open_&&_date_prof", {
+            date: "open",
+            dd,
+            years,
+            times,
+          });
+        } else {
+          console.log("termine");
+          return res.render("open_&&_date_prof", {
+            date: "termine",
+            years: "",
+            times: "",
+          });
+        }
       } else {
-        console.log("termine");
-        return res.render('open_&&_date_prof', { date: "termine", years: "", times: "" });
+        return res.render("open_&&_date_prof", {
+          date: "close",
+          years: "",
+          times: "",
+        });
       }
-    } else { return res.render('open_&&_date_prof', { date: "close", years: "", times: "" }); }
-  });
-});
-app.get('/date_open_prof', (req, res) => {
-  if (req.session.matriculeEtudiant !== "admin") {
-    return res.render('404');
-  }
+    });
+}
+async function dateOpenProf(req, res) {
+  // if (req.session.matriculeEtudiant !== "admin") {
+  //   return res.render('404');
+  // }
   const date = req.query.date;
   const time = req.query.time;
 
-  // Récupérer tous les emails des enseignants dans la collection 'enseignant'
-  db.collection('enseignant').find({}, { projection: { autresprof: 1, email: 1 } }).toArray((err, enseignants) => {
-    if (err) {
-        console.error("Erreur lors de la récupération des enseignants :", err);
-        return res.render('error');
-    }
+  // Insérer ou mettre à jour la date dans la base de données
+  db.collection("date_prof")
+    .find()
+    .toArray((err, data) => {
+      if (data.length === 0) {
+        const newData = {
+          date: date,
+          time: time,
+          reclamation: "open",
+        };
 
-    // Liste de tous les emails des enseignants
-    const emails = [];
+        db.collection("date_prof").insertOne(newData, (err, collection) => {
+          if (err) {
+            console.error("Erreur lors de l'insertion de la date :", err);
+            return res.render("error");
+          }
+          db.collection("etudiants")
+            .find({}, { matricule: 1, _id: 0 })
+            .toArray(function (err, result) {
+              if (err) throw err;
 
-    // Récupérer tous les emails de la liste autresprof de chaque enseignant
-    enseignants.forEach(enseignant => {
-        if (enseignant.autresprof && enseignant.autresprof.length > 0) {
-            enseignant.autresprof.forEach(prof => {
-                if (prof.email_autre) {
-                    emails.push(prof.email_autre);
-                }
+              // Maintenant, result contient la liste des matricules
+              let emails = [];
+
+              result.forEach(function (etudiant) {
+                let matricule = etudiant.matricule;
+                let email = matricule + "@supnum.mr";
+                emails.push(email);
+              });
+              sendEmail(
+                "netcode",
+                emails,
+                "Reclamation Date ",
+                "La réclamation est ouverte. Pour traiter les notes, veuillez visiter notre site."
+              );
+              return res.redirect("/eleve");
             });
-        }
-        
-        // Ajouter l'email principal de l'enseignant s'il existe
-        if (enseignant.email) {
-            emails.push(enseignant.email);
-        }
+        });
+      } else {
+        const updateData = {
+          $set: {
+            date: date,
+            time: time,
+            reclamation: "open",
+          },
+        };
+
+        db.collection("date_prof").updateMany(
+          { reclamation: "open" },
+          updateData,
+          function (err, data) {
+            if (err) {
+              console.error("Erreur lors de la mise à jour de la date :", err);
+              return res.render("error");
+            }
+            db.collection("etudiants")
+              .find({}, { matricule: 1, _id: 0 })
+              .toArray(function (err, result) {
+                if (err) throw err;
+
+                // Maintenant, result contient la liste des matricules
+                let emails = [];
+
+                result.forEach(function (etudiant) {
+                  let matricule = etudiant.matricule;
+                  let email = matricule + "@supnum.mr";
+                  emails.push(email);
+                });
+                sendEmail(
+                  "Gestion de réclamation",
+                  emails,
+                  "Reclamation Date",
+                  "La date de réclamation a été modifiée. Pour plus d'informations, visitez notre site."
+                );
+                return res.redirect("/eleve");
+              });
+          }
+        );
+      }
     });
+}
 
-    // Insérer ou mettre à jour la date dans la base de données
-    db.collection('date_prof').find().toArray((err, data) => {
-        if (data.length === 0) {
-            const newData = {
-                "date": date,
-                "time": time,
-                "reclamation": "open"
-            };
-
-            db.collection('date_prof').insertOne(newData, (err, collection) => {
-                if (err) {
-                    console.error("Erreur lors de l'insertion de la date :", err);
-                    return res.render('error');
-                }
-                console.log("Les emails ont été envoyés :", emails);
-                sendEmail("Gestion de réclamation", emails, 'Reclamation Date ', 'La réclamation est ouverte. Pour traiter les notes, veuillez visiter notre site.');
-                return res.redirect('/eleve');
-            });
-        } else {
-            const updateData = {
-                $set: {
-                    "date": date,
-                    "time": time,
-                    "reclamation": "open"
-                }
-            };
-
-            db.collection('date_prof').updateMany({ reclamation: "open" }, updateData, function (err, data) {
-                if (err) {
-                    console.error("Erreur lors de la mise à jour de la date :", err);
-                    return res.render('error');
-                }
-                console.log("Les emails ont été envoyés :", emails);
-                sendEmail("Gestion de réclamation", emails, 'Reclamation Date', 'La date de réclamation a été modifiée. Pour plus d\'informations, visitez notre site.');
-                return res.redirect('/eleve');
-            });
-        }
-    });
-});
-
-
-});
 module.exports = {
   renderAdminHomePage,
   importDataFromExcel,
-  renderManageUsersPage,
-  renderManageDataPage,
   addjuryMember,
   newJuryMember,
   grille,
   addCriter,
+  dateprofupdate,
+  dateProf,
+  dateOpenProf,
+  student,
+  equipe,
+  jury,
+  challenge
 };

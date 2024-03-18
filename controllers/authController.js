@@ -38,7 +38,17 @@ async function loginUser(req, res) {
     }
 
     req.session.user = user;
-    res.redirect("/admin/dashboard"); // Redirige vers la page de tableau de bord après connexion réussie
+
+    if(user.types == "admin"){
+      res.redirect("/admin/dashboard");
+    }else{
+      if(user.types == "student"){
+        res.redirect("/student/dashboard");
+      }else{
+        res.redirect("/jury/dashboard");
+      }
+    }
+// Redirige vers la page de tableau de bord après connexion réussie
   } catch (error) {
     console.error("Erreur lors de la tentative de connexion :", error);
     res.render("login", {
@@ -171,10 +181,108 @@ function generateRandomCode(length) {
   return code;
 }
 
+function renderForgotPasswordPage (req, res){
+  res.render('forgot-password'); // Assurez-vous d'avoir un fichier de modèle correspondant
+};
+
+async function sendResetPasswordEmail (req, res) {
+  const email = req.body.email;
+
+  // Vérifier si l'email existe dans la collection users
+  const user = await db.collection("users").findOne({ email });
+
+  if (!user) {
+    // L'email n'existe pas dans la collection users
+    console.log("L'email n'existe pas dans la collection users");
+    res.render('forgot-password', { eror: 'Email non trouvé' });
+    return;
+  }
+
+  // L'email existe dans la collection users, continuez avec l'envoi du code aléatoire
+  const randomCode = await sendRandomCode("Gestion de reclamation ",email);
+
+  // Stockez l'email et le randomCode dans la session
+  req.session.email = email;
+  req.session.randomCode = randomCode;
+
+  console.log('randomCode stocké dans la session :', randomCode);
+  console.log(req.session.email);
+
+  // Redirigez vers le formulaire de vérification du code
+  res.redirect('/verify-code');
+};
+function verifypasswordcodePage(req, res)  {
+  res.render('verify-code'); // Assurez-vous d'avoir un fichier de modèle correspondant
+};
+function verifypasswordcode (req, res){
+  const { code, email } = req.body;
+  const randomCode = req.session.randomCode;
+
+  console.log('Code entré :', code);
+  console.log('randomCode stocké :', randomCode);
+
+  // Vérifiez si le code est valide
+  if (code === randomCode) {
+    console.log('Le code est valide. Redirection vers /reset-password');
+    // Redirigez vers le formulaire de réinitialisation du mot de passe en transmettant l'email
+    res.render('reset-password', { email });
+  } else {
+    // Le code est invalide, affichez un message d'erreur par exemple
+    console.log('Le code est invalide. Rendu de verify-code avec une erreur');
+    res.render('verify-code', { eror: 'Code invalide' });
+  }
+};
+function renderResetPasswordPage(req, res){
+  res.render('reset-password'); // Assurez-vous d'avoir un fichier de modèle correspondant
+};
+function resetPassword(req, res) {
+  const { newPassword } = req.body;
+
+  // Sélectionner l'e-mail de l'utilisateur à partir de la session
+  const email = req.session.email;
+
+  console.log("L'e-mail est : ", email);
+
+  // Hasher le nouveau mot de passe
+  bcrypt.hash(newPassword, 10, (err, hashedPassword) => {
+    if (err) {
+      console.error('Erreur lors du hachage du mot de passe :', err);
+      res.status(500).send('Une erreur s\'est produite lors de la réinitialisation du mot de passe');
+      return;
+    }
+
+    // Paramètres de mise à jour
+    const query = { email };
+    const update = { $set: { password: hashedPassword } };
+
+    // Effectuer la mise à jour
+    db.collection("users").updateOne(query, update, (error, result) => {
+      if (error) {
+        console.error('Utilisateur non trouvé :', error);
+        res.status(500).send('Utilisateur non trouvé');
+        return;
+      }
+
+      if (result.modifiedCount === 0) {
+        console.log('Aucun document mis à jour. Utilisateur non trouvé.');
+        res.status(404).send('Erreur lors de la mise à jour du mot de passe');
+      } else {
+        console.log('Mot de passe mis à jour avec succès.');
+        return res.render('login', { Success: "Mot de passe mis à jour avec succès" });
+      }
+    });
+  });
+};
 module.exports = {
   renderLoginPage,
   logoutUser,
   loginUser,
   registerUser,
   verifyRegistre,
+  renderForgotPasswordPage,
+  sendResetPasswordEmail,
+  renderResetPasswordPage,
+  resetPassword,
+  verifypasswordcodePage,
+  verifypasswordcode
 };
