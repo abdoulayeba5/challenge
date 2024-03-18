@@ -1,0 +1,79 @@
+<%- include("top.ejs") %>
+
+<section class="home-section">
+  <form id="equipeForm" action="equipe_insert">
+    <!-- Choix du Lead -->
+    <label for="name">Nom de l'équipe :</label>
+    <input type="text" id="name" name="name" />
+    <label for="lead">Lead :</label>
+    <select id="lead" name="lead">
+      <% array.forEach((student, index) => { %>
+      <option value="<%= student.matricule %>"><%= student.matricule %></option>
+      <% }) %>
+    </select>
+
+    <!-- Choix de l'Adjoint -->
+    <label for="adjoint">Adjoint :</label>
+    <select id="adjoint" name="adjoint">
+      <% array.forEach((student, index) => { %>
+      <option value="<%= student.matricule %>"><%= student.matricule %></option>
+      <% }) %>
+    </select>
+
+    <!-- Choix du nombre de membres de l'équipe -->
+    <label for="nombreMembres"
+      >Nombre de membres de l'équipe (entre 4 et 6) :</label
+    >
+    <input
+      type="number"
+      id="nombreMembres"
+      name="nombreMembres"
+      min="4"
+      max="6"
+    />
+
+    <!-- Conteneur pour les sélections dynamiques -->
+    <div id="memberSelections"></div>
+    <br /><br />
+    <button type="submit">Soumettre</button>
+  </form>
+
+  <script>
+    // Parse the JSON string embedded in the script tag
+    const arrayData = JSON.parse("<%- JSON.stringify(array) %>");
+
+    // Function to dynamically generate select elements based on the number entered
+    function generateSelects() {
+      const selectContainer = document.getElementById("memberSelections");
+      selectContainer.innerHTML = ""; // Clear previous select elements
+
+      const numberOfMembers = parseInt(
+        document.getElementById("nombreMembres").value
+      );
+
+      for (let i = 0; i < numberOfMembers; i++) {
+        const select = document.createElement("select");
+        select.setAttribute("name", `member_${i}`);
+        selectContainer.appendChild(select);
+
+        // Add options to the select element
+        arrayData.forEach((student) => {
+          const option = document.createElement("option");
+          option.value = student.matricule;
+          option.textContent = student.matricule;
+          select.appendChild(option);
+        });
+      }
+    }
+
+    // Event listener to call generateSelects when the input value changes
+    document
+      .getElementById("nombreMembres")
+      .addEventListener("change", generateSelects);
+
+    // Initial call to generateSelects to populate select elements based on initial input value
+    generateSelects();
+  </script>
+</section>
+
+<%- include("bottom.ejs") %>

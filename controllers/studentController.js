@@ -3,6 +3,7 @@ const db = require("../config/databaseConfig");
 
 async function renderStudentPage(req, res) {
   // Logique pour afficher la page des étudiants
+  res.render("student/acceuil")
 }
 
 async function selectEquipe(req, res) {
@@ -47,7 +48,7 @@ async function selectEquipe(req, res) {
             matricule: student.matricule,
           }));
           req.session.array = studentArray;
-          return res.render("equipe", { array: studentArray, error: " " });
+          return res.render("student/equipe", { array: studentArray, error: " " });
         });
     });
 }
@@ -154,4 +155,5 @@ async function equipe_insert(req, res) {
 module.exports = {
   renderStudentPage,
   selectEquipe,
+  equipe_insert
 };

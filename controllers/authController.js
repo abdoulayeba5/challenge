@@ -43,9 +43,9 @@ async function loginUser(req, res) {
       res.redirect("/admin/dashboard");
     }else{
       if(user.types == "student"){
-        res.redirect("/student/dashboard");
+        res.redirect("/student/acceuil");
       }else{
-        res.redirect("/jury/dashboard");
+        res.redirect("/jury/acceuil");
       }
     }
 // Redirige vers la page de tableau de bord après connexion réussie

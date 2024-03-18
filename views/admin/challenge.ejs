@@ -1,0 +1,25 @@
+<%- include("top.ejs") %>
+
+<section class="home-section">
+  <br /><br /><br /><br /><br /><br />
+  <div class="container">
+    <h2>Formulaire d'envoi de fichier</h2>
+    <form
+      id="uploadForm"
+      action="upload"
+      method="post"
+      enctype="multipart/form-data"
+    >
+      <div class="form-group">
+        <label for="fileInput">Choisir un fichier :</label>
+        <input type="file" id="fileInput" name="fileInput" />
+      </div>
+      <div class="form-group">
+        <button type="submit">
+          <i class="bx bxs-cloud-upload file-upload-icon"></i>Envoyer
+        </button>
+      </div>
+    </form>
+  </div>
+</section>
+<%- include("bottom.ejs") %>

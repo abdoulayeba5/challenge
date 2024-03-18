@@ -29,21 +29,61 @@ async function renderAdminHomePage(req, res) {
 
 // Afficher la page d'accueil de l'administrateur
 async function student(req, res) {
-  res.render("admin/student");
+  try {
+    const array = await db.collection("etudiants").find().toArray();
+    console.log("array", array);
+    res.render("admin/student", { array });
+  } catch (error) {
+    console.error(
+      "Erreur lors de l'affichage de la page d'accueil de l'administrateur :",
+      error
+    );
+    res.render("error", { error });
+  }
 }
 
 // Afficher la page d'accueil de l'administrateur
 async function equipe(req, res) {
-  res.render("equipe");
+  try {
+    const array = await db.collection("equipe").find().toArray();
+    console.log("array", array);
+    res.render("admin/equipe", { array });
+  } catch (error) {
+    console.error(
+      "Erreur lors de l'affichage de la page d'accueil de l'administrateur :",
+      error
+    );
+    res.render("error", { error });
+  }
 }
 // Afficher la page d'accueil de l'administrateur
 async function jury(req, res) {
-  res.render("jury");
+  try {
+    const array = await db.collection("jury").find().toArray();
+    console.log("array", array);
+    res.render("admin/jury", { array });
+  } catch (error) {
+    console.error(
+      "Erreur lors de l'affichage de la page d'accueil de l'administrateur :",
+      error
+    );
+    res.render("error", { error });
+  }
 }
 
 // Afficher la page d'accueil de l'administrateur
 async function challenge(req, res) {
-  res.render("challenge");
+  try {
+    const array = await db.collection("challenge").find().toArray();
+    console.log("array", array);
+    res.render("admin/challenge", { array });
+  } catch (error) {
+    console.error(
+      "Erreur lors de l'affichage de la page d'accueil de l'administrateur :",
+      error
+    );
+    res.render("error", { error });
+  }
 }
 // Importer des données à partir d'un fichier Excel
 async function importDataFromExcel(req, res) {
@@ -339,5 +379,5 @@ module.exports = {
   student,
   equipe,
   jury,
-  challenge
+  challenge,
 };
