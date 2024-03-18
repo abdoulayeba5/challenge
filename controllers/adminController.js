@@ -12,7 +12,7 @@ async function renderAdminHomePage(req, res) {
       "Allow-access-Allow-Origin": "*",
     });
     const imagePath = "public/logo.png";
-    return res.render("home1", {
+    return res.render("admin/student", {
       Error: req.session.matriculeEtudiant,
       imagePath: imagePath,
     });
@@ -366,6 +366,23 @@ async function dateOpenProf(req, res) {
     });
 }
 
+async function newchallange(req, res) {
+  const { Defi, description, datelimit } = req.body;
+
+  const data = {
+    defi: Defi,
+    description: description,
+    datelimit: datelimit,
+  };
+  try {
+    await db.collection("challenge").insertOne(data);
+
+    res.redirect("challange");
+  } catch (error) {
+    console.error("Erreur lors de l'ajout du critère :", error);
+    res.render("error");
+  }
+}
 module.exports = {
   renderAdminHomePage,
   importDataFromExcel,
@@ -380,4 +397,5 @@ module.exports = {
   equipe,
   jury,
   challenge,
+  newchallange,
 };

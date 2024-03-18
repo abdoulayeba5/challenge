@@ -16,6 +16,7 @@ router.get("/date_open_prof", adminController.dateOpenProf);
 router.get("/student", adminController.student);
 router.get("/equipe", adminController.equipe);
 router.get("/jury", adminController.jury);
-router.get("/challenge", adminController.challenge);
+router.get("/challange", adminController.challenge);
+router.post("/newchallange", adminController.newchallange);
 
 module.exports = router;

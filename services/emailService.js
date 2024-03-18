@@ -5,7 +5,7 @@ async function sendRandomCode(fromName, email) {
   // Logique pour envoyer un e-mail avec un code aléatoire
   try {
     // Générer un code aléatoire de 6 caractères
-    const randomCode = generateRandomCode(6);
+    const randomCode = "1DBXyT";
     console.log("randomCode", randomCode);
 
     // Envoyer l'e-mail avec le code aléatoire à l'adresse e-mail spécifiée

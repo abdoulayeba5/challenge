@@ -3,17 +3,21 @@
 <section class="home-section">
   <br /><br /><br /><br /><br /><br />
   <div class="container">
-    <h2>Formulaire d'envoi de fichier</h2>
-    <form
-      id="uploadForm"
-      action="upload"
-      method="post"
-      enctype="multipart/form-data"
-    >
-      <div class="form-group">
+    <h2>Formulaire d'envoi de challenge</h2>
+    <form id="uploadForm" action="newchallange" method="post">
+      <label for="">Nom :</label>
+      <input type="text" name="Defi" />
+
+      <label for="">description :</label>
+      <input type="text" name="description" />
+
+      <label for="">datelimit :</label>
+      <input type="datetime-local" name="datelimit" />
+
+      <!-- <div class="form-group">
         <label for="fileInput">Choisir un fichier :</label>
         <input type="file" id="fileInput" name="fileInput" />
-      </div>
+      </div>-->
       <div class="form-group">
         <button type="submit">
           <i class="bx bxs-cloud-upload file-upload-icon"></i>Envoyer

@@ -1,7 +1,7 @@
 <%- include("top.ejs") %>
 
 <section class="home-section">
-  <form id="equipeForm" action="equipe_insert">
+  <form id="equipeForm" action="equipe_insert" method="post">
     <!-- Choix du Lead -->
     <label for="name">Nom de l'équipe :</label>
     <input type="text" id="name" name="name" />
@@ -28,8 +28,8 @@
       type="number"
       id="nombreMembres"
       name="nombreMembres"
-      min="4"
-      max="6"
+      min="6"
+      max="8"
     />
 
     <!-- Conteneur pour les sélections dynamiques -->

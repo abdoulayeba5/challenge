@@ -3,7 +3,7 @@ const db = require("../config/databaseConfig");
 
 async function renderStudentPage(req, res) {
   // Logique pour afficher la page des étudiants
-  res.render("student/acceuil")
+  res.render("student/acceuil");
 }
 
 async function selectEquipe(req, res) {
@@ -48,7 +48,10 @@ async function selectEquipe(req, res) {
             matricule: student.matricule,
           }));
           req.session.array = studentArray;
-          return res.render("student/equipe", { array: studentArray, error: " " });
+          return res.render("student/equipe", {
+            array: studentArray,
+            error: " ",
+          });
         });
     });
 }
@@ -81,7 +84,7 @@ async function equipe_insert(req, res) {
     console.log(
       "Il y a des valeurs dupliquées dans l'équipe (membres, lead ou adjoint)."
     );
-    return res.render("equipe", {
+    return res.render("student/equipe", {
       error:
         "Il y a des valeurs dupliquées dans l'équipe (membres, lead ou adjoint).",
       array: req.session.array,
@@ -139,13 +142,13 @@ async function equipe_insert(req, res) {
         "Le lead et l'adjoint ont des niveaux différents, et il y a trois membres de niveau L2."
       );
       db.collection("equipe").insertOne(equipeDoc);
-      return res.render("equipe", {
+      return res.render("student/equipe", {
         error: "Equipe inserted successfully",
         array: req.session.array,
       });
     } else {
       console.log("Les conditions requises ne sont pas remplies.");
-      return res.render("equipe", {
+      return res.render("student/equipe", {
         error: "Les conditions requises ne sont pas remplies.",
         array: req.session.array,
       });
@@ -155,5 +158,5 @@ async function equipe_insert(req, res) {
 module.exports = {
   renderStudentPage,
   selectEquipe,
-  equipe_insert
+  equipe_insert,
 };

@@ -1,23 +1,51 @@
 <%- include("top.ejs") %>
 
 <section class="home-section">
-  <h1>jury</h1>
-
   <h3>add jury</h3>
-  <form method="post" action="new_jury">
-    nom :<input type="nom" name="nom" id="" /> prenom :<input
-      type="prenom"
-      name="prenom"
-      id=""
-    />
-    email :<input type="email" name="email" id="" /> password :<input
-      type="password"
-      name="password"
-      id=""
-    />
-    confirm password:<input type="password" name="cpassword" id="" /><br />
-    <input type="submit" value="submit" />
-  </form>
+  <!-- <div class="container">
+    <form method="post" id="uploadForm" action="new_jury">
+      nom :<input type="nom" name="nom" id="" /> prenom :<input
+        type="prenom"
+        name="prenom"
+        id=""
+      />
+      email :<input type="email" name="email" id="" /> password :<input
+        type="password"
+        name="password"
+        id=""
+      />
+      confirm password:<input type="password" name="cpassword" id="" /><br />
+      <input type="submit" value="submit" />
+    </form>
+  </div> -->
+
+  <section class="home-section">
+    <br /><br /><br /><br /><br /><br />
+    <div class="container">
+      <h2>Formulaire d'envoi de challenge</h2>
+      <form id="uploadForm" action="new_jury" method="post">
+        <label for="">Nom :</label>
+        <input type="text" name="nom" id="" />
+
+        <label for="">prenom :</label>
+        <input type="text" name="prenom" />
+
+        <label for="">Email :</label>
+        <input type="email" name="email" id="" />
+
+        <label for="">password :</label>
+        <input type="password" name="password" />
+        <label for="">confirm password :</label>
+        <input type="password" name="cpassword" id="" />
+
+        <div class="form-group">
+          <button type="submit">
+            <i class="bx bxs-cloud-upload file-upload-icon"></i>Envoyer
+          </button>
+        </div>
+      </form>
+    </div>
+  </section>
 </section>
 
 <%- include("bottom.ejs") %>
